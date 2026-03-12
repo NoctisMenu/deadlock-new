@@ -24,8 +24,10 @@ phf = { version = "0.13.1", features = ["macros"] }
 anyhow = "1.0.101"
 unreal-esp = {git = "https://github.com/NoctisMenu/unreal.git", default-features=false, features = ["ue5"]}
 unreal-types = {git = "https://github.com/NoctisMenu/unreal.git", default-features=false, features = ["ue5"]}
+rhai = { version = "1.24.0", features = ["sync"] }
+notify = "8.2.0"
 
 [build-dependencies]
-newbase = { path = ".." }
+newbase = { git = "https://github.com/NoctisMenu/newbase.git" }
 
 [workspace]
