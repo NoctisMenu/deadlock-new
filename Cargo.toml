@@ -26,6 +26,7 @@ unreal-esp = {git = "https://github.com/NoctisMenu/unreal.git", default-features
 unreal-types = {git = "https://github.com/NoctisMenu/unreal.git", default-features=false, features = ["ue5"]}
 rhai = { version = "1.24.0", features = ["sync"] }
 notify = "8.2.0"
+#raskal-mouse = {path="./raskal-mouse"}
 
 [build-dependencies]
 newbase = { git = "https://github.com/NoctisMenu/newbase.git" }

@@ -1,0 +1,23 @@
+version: 1
+
+builder:
+  image: ghcr.io/b1fr0st/builderd-rust-newbase@sha256:ad320d78ce0dcad8487796eca7c7832a0dba784ff87a1d41716eeaa39c431c1d
+  working_directory: C:\builderd\source
+  command:
+    - C:\builderd\build-newbase.cmd
+  environment:
+    CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+    CARGO_HTTP_TIMEOUT: "120"
+    CARGO_NET_RETRY: "3"
+    GIT_TERMINAL_PROMPT: "0"
+    NEWBASE_PROFILE: "release"
+    RUST_BACKTRACE: "1"
+
+artifact:
+  path: C:\builderd\output\deadlock-new.exe
+
+resources:
+  timeout: 30m
+  cpu: 4
+  memory: 8GiB
+  disk: 30GiB

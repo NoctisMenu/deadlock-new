@@ -12,6 +12,7 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 
 use crate::models::EntityType;
 use crate::models::math::{Matrix, Vector3};
+use crate::offsets::client_dll::cs2_dumper::schemas::client_dll::*;
 use crate::offsets::{client_base, resolved_offsets};
 use crate::player::{AppData, Player};
 
@@ -19,7 +20,7 @@ const AIM_ENABLED: bool = true;
 const HUMANIZE_AIM: bool = true;
 
 const AIM_FOV: f64 = 150.0;
-const AIM_SMOOTHING: f64 = 0.08;
+const AIM_SMOOTHING: f64 = 0.15;
 const AIM_DISTANCE_ENABLED: bool = false;
 const AIM_DISTANCE: f64 = 1000.0;
 
@@ -41,6 +42,9 @@ const SCREEN_WIDTH: f64 = 2560.0;
 const SCREEN_HEIGHT: f64 = 1440.0;
 const SCREEN_CENTER_X: f64 = SCREEN_WIDTH * 0.5;
 const SCREEN_CENTER_Y: f64 = SCREEN_HEIGHT * 0.5;
+
+
+//static MOUSE: std::sync::OnceLock<raskal_mouse::Mouse> = std::sync::OnceLock::new();
 
 #[derive(Clone, Copy)]
 enum TeamCheck {
@@ -238,6 +242,8 @@ fn move_mouse(dx: i32, dy: i32) {
 
         let _ = SendInput(&[input], std::mem::size_of::<INPUT>() as i32);
     }
+    // let mouse = MOUSE.get_or_init(||raskal_mouse::Mouse::open().unwrap());
+    // let _ = mouse.move_rel(dx, dy);
 }
 
 fn as_fvector(world: Vector3) -> FVector {
@@ -271,6 +277,31 @@ pub fn run(ctx: &ThreadCtx<AppData>) -> ThreadFlow {
     };
     let local_team_id = local.team_id;
     let local_pos = as_fvector(local.pos);
+
+    let velocity: f32 = (|| -> Option<f32> {
+        let ability_component = local.pawn + C_CitadelPlayerPawn::m_CCitadelAbilityComponent;
+        let vec_abilities = ability_component + CCitadelAbilityComponent::m_vecAbilities;
+        let data = read::<usize>(vec_abilities + 0x8).ok()?;
+        if data < 0x10000 { return None; }
+        let handle = read::<u32>(data).ok()? as usize;
+
+        let offsets = resolved_offsets();
+        let client_base = client_base();
+        let entity_list = read::<usize>(client_base + offsets[0]).unwrap();
+
+        let Ok(ent_entry) = read::<usize>(entity_list + 8 * ((handle & 0x7FFF) >> 9) + 16) else { return None };
+        if ent_entry == 0 {
+            return None
+        }
+
+        let Ok(controller) = read::<usize>(ent_entry + 0x70 * (handle & 0x1ff)) else { return None};
+        
+        let data_ptr = read::<usize>(controller + 0x390).ok()?;
+        if data_ptr < 0x10000 { return None; }
+        read::<f32>(data_ptr + 0x20c).ok()
+    })().unwrap_or(300.0);
+
+    dbg!(velocity);
 
     if HUMANIZE_AIM && MOVEMENT_THRESHOLD > 0.0 {
         let (cursor_now, _) = read_mouse_state();
@@ -401,6 +432,9 @@ pub fn run(ctx: &ThreadCtx<AppData>) -> ThreadFlow {
 
             // No bullet velocity/target velocity in this pipeline; keep raw target as-is.
             let raw_predicted = bone_location;
+            let distance = local_pos.distance(raw_predicted);
+            let time = distance / velocity as f64;
+            let raw_predicted = as_fvector(player.velocity) * time + raw_predicted;
 
             let target_location = match world_to_screen(&view_matrix, raw_predicted) {
                 Some(screen) => screen,

@@ -37,6 +37,22 @@ pub enum AbilitySlot {
     ESlot_None = 0x16, // EMaxAbilitySlots
 }
 
+impl TryFrom<u16> for AbilitySlot {
+    type Error = ();
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        // Variants are contiguous 0x0..=0x16, so a range check makes the
+        // transmute sound. Never construct this enum straight from game
+        // memory: an out-of-range discriminant is UB (Debug formatting an
+        // invalid value jumps through a bogus table entry -> access violation).
+        if value <= AbilitySlot::ESlot_None as u16 {
+            Ok(unsafe { std::mem::transmute::<u16, AbilitySlot>(value) })
+        } else {
+            Err(())
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 #[repr(u8)]
 pub enum EJumpType {

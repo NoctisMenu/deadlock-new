@@ -1,0 +1,7 @@
+03:38:28 [INFO] found 41 buttons
+03:38:28 [INFO] found 102 interfaces across 30 modules
+03:38:29 [ERROR] outdated pattern: dwSensitivity
+03:38:29 [ERROR] outdated pattern: dwGameTraceManager
+03:38:29 [INFO] found 9 offsets across 2 modules
+03:38:29 [INFO] found 8402 classes and 763 enums across 18 modules
+03:38:29 [INFO] analysis completed in 1.13s

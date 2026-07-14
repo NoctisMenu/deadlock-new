@@ -47,6 +47,8 @@ fn lerp_color(from: [u8; 3], to: [u8; 3], t: f32) -> u32 {
 
 #[derive(Debug, Default, Clone)]
 pub struct Player {
+    pub pawn: usize,
+    pub velocity: Vector3,
     pub pos: Vector3,
     pub view_yaw: f32,
     pub alive: bool,

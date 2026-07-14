@@ -1,12 +1,12 @@
 use std::ops::Mul;
 
 
-#[derive(PartialEq, Default, Clone, Copy, Debug)]
-pub struct Vector3 {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
+    #[derive(PartialEq, Default, Clone, Copy, Debug)]
+    pub struct Vector3 {
+        pub x: f32,
+        pub y: f32,
+        pub z: f32,
+    }
 
 impl Vector3 {
     pub fn is_zero(&self) -> bool {

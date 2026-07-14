@@ -335,12 +335,6 @@ fn esp(
         .map(|p| p.pos)
         .or_else(|| players.first().map(|p| p.pos))
         .unwrap_or_default();
-    let local_ability_debug = players
-        .iter()
-        .find(|p| p.is_local)
-        .map(|p| format!("{:#?}", p.abilities))
-        .unwrap_or_else(|| "local player not found".to_string());
-
     for entity in entities.iter() {
         if !entity.visible {
             continue;
@@ -469,9 +463,11 @@ pub fn players(ctx: &ThreadCtx<AppData>) -> ThreadFlow {
             entity_list + 0x8 * ((pawn_handle & 0x7FFF) >> 9) + 16
         ));
         let pawn = skip_err!(read::<usize>(entry + 0x70 * (pawn_handle & 0x1ff)));
+        player.pawn = pawn;
 
         let scene_node = skip_err!(read::<usize>(pawn + C_BaseEntity::m_pGameSceneNode));
         player.pos = skip_err!(read::<Vector3>(scene_node + CGameSceneNode::m_vecAbsOrigin));
+        player.velocity = skip_err!(read::<Vector3>(pawn + C_BaseEntity::m_vecVelocity)); 
         if let Ok(abs_rotation) = read::<Vector3>(scene_node + CGameSceneNode::m_angAbsRotation) {
             player.view_yaw = abs_rotation.y;
         } else if let Ok(local_rotation) =
@@ -602,9 +598,15 @@ pub fn players(ctx: &ThreadCtx<AppData>) -> ThreadFlow {
                     _ => continue,
                 };
 
-                let slot = match read::<AbilitySlot>(ability_entity + C_CitadelBaseAbility::m_eAbilitySlot) {
-                    Ok(slot) => slot,
-                    Err(_) => continue,
+                // Read the raw discriminant and convert checked: transmuting
+                // garbage game memory into AbilitySlot is UB and crashed the
+                // render thread when Debug-formatting an invalid variant.
+                let slot = match read::<u16>(ability_entity + C_CitadelBaseAbility::m_eAbilitySlot)
+                    .ok()
+                    .and_then(|raw| AbilitySlot::try_from(raw).ok())
+                {
+                    Some(slot) => slot,
+                    None => continue,
                 };
 
                 let cooling_down = match read::<bool>(

@@ -1038,7 +1038,7 @@ dependencies = [
 [[package]]
 name = "newoverlay"
 version = "0.1.0"
-source = "git+https://github.com/noctismenu/newoverlay#cef0ce80c1c5ba550e4c4d7f2e0e74caea600de2"
+source = "git+https://github.com/noctismenu/newoverlay#41a4b668bd06df4ca8bd68312ec5377451c03653"
 dependencies = [
  "imgui",
  "imgui-dx9-renderer",
