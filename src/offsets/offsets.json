@@ -1,0 +1,15 @@
+{
+  "client.dll": {
+    "dwEntityList": 50864336,
+    "dwGameEntitySystem": 59467704,
+    "dwGameEntitySystem_highestEntityIndex": 8352,
+    "dwGlobalVars": 48938248,
+    "dwLocalPlayerController": 58078832,
+    "dwSensitivity_sensitivity": 88,
+    "dwViewMatrix": 58296112,
+    "dwViewRender": 58297136
+  },
+  "engine2.dll": {
+    "dwBuildNumber": 6395204
+  }
+}
