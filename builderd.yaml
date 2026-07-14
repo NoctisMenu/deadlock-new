@@ -14,7 +14,7 @@ builder:
     RUST_BACKTRACE: "1"
 
 artifact:
-  path: C:\builderd\output\deadlock-new.exe
+  path: C:\builderd\output\new-deadlock.exe
 
 resources:
   timeout: 30m
